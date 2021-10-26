@@ -13,24 +13,28 @@ class Game:
         self.pointPosition = {"row":0, "column":0}
 
         self.points = 0
+        self.sizeToGrow = 0
 
         self.snakeSize = 4
         self.snakeHead = {'column':1, 'row':4}
         self.snakeBody = [{'column':1, 'row':3},{'column':1, 'row':2}]
         self.snakeTail = {'column':1, 'row':1}
 
-        self.gameDelay = 0.5
+        self.gameDelay = 0.05
 
         self.keyPressed = ""
+
+
 
     def run(self):
         startTime = datetime.now()
         currentTime = datetime.now()
         while self.alive:
-            elapsedSeconds = (currentTime - startTime).seconds/self.gameDelay
-            if elapsedSeconds >= 1:
+            elapsedSeconds = float((currentTime - startTime).microseconds/self.gameDelay)
+            if elapsedSeconds >= 1.0:
                 self.placePoint()
                 self.moveSnake()
+                self.growSnake()
                 startTime = currentTime    
             currentTime = datetime.now()
             self.detectPlayerInput()
@@ -38,12 +42,24 @@ class Game:
 
     def placePoint(self):
         if not self.pointDisplayed:
-            column = randrange(0,30)
-            row = randrange(0,30)
-            self.GUI.drawPoint(column, row)
+            availablePositions = []
+            for column in range(0,30):
+                for row in range(0,30):
+                    availablePositions.append({'column':column, 'row':row})
+            for snakePart in self.snakeBody:
+                if snakePart in availablePositions:
+                    availablePositions.remove(snakePart)
+            if self.snakeHead in availablePositions:
+                availablePositions.remove(self.snakeHead)
+            if self.snakeTail in availablePositions:
+                availablePositions.remove(self.snakeTail)
+
+            shuffle(availablePositions)
+
+            self.GUI.drawPoint(availablePositions[0]['column'], availablePositions[0]['row'])
             self.pointDisplayed = True
-            self.pointPosition["column"] = column
-            self.pointPosition["row"] = row
+            self.pointPosition["column"] = availablePositions[0]['column']
+            self.pointPosition["row"] = availablePositions[0]['row']
         else:
             self.GUI.drawPoint(self.pointPosition["column"], self.pointPosition["row"])
 
@@ -92,13 +108,13 @@ class Game:
     
     def detectPlayerInput(self):
         try:
-            if is_pressed('left'):
+            if is_pressed('left') and not self.keyPressed == "Right":
                 self.keyPressed = "Left"
-            elif is_pressed('up'):
+            elif is_pressed('up') and not self.keyPressed == "Down":
                 self.keyPressed = "Up"
-            elif is_pressed('right'):
+            elif is_pressed('right') and not self.keyPressed == "Left":
                 self.keyPressed = "Right"
-            elif is_pressed('down'):
+            elif is_pressed('down') and not self.keyPressed == "Up":
                 self.keyPressed = "Down"
         except:
             pass 
@@ -108,4 +124,31 @@ class Game:
         if self.snakeHead['column'] == self.pointPosition['column'] and self.snakeHead['row'] == self.pointPosition['row']:
             self.pointDisplayed = False
             self.points = self.points + 1
-            print(self.points)
+            self.sizeToGrow = self.sizeToGrow + 1
+            self.gameDelay = self.gameDelay + 0.05
+    
+    def growSnake(self):
+        if self.sizeToGrow > 0:
+            availablePositions = []
+            growToLeft = {'column': self.snakeTail['column'],'row': self.snakeTail['row']-1}
+            if growToLeft not in self.snakeBody:
+                availablePositions.append(growToLeft)
+            growToUp = {'column': self.snakeTail['column']-1,'row': self.snakeTail['row']}
+            if growToUp not in self.snakeBody:
+                availablePositions.append(growToUp)
+            growToRight = {'column': self.snakeTail['column'],'row': self.snakeTail['row']+1}
+            if growToRight not in self.snakeBody:
+                availablePositions.append(growToRight)
+            growToDown = {'column': self.snakeTail['column']+1,'row': self.snakeTail['row']}
+            if growToDown not in self.snakeBody:
+                availablePositions.append(growToDown)
+
+            if len(availablePositions) > 0:
+                shuffle(availablePositions)
+                self.snakeBody = self.snakeBody + [self.snakeTail]
+                self.snakeTail = availablePositions[0]
+                self.GUI.drawSnake([self.snakeTail])
+                
+                self.sizeToGrow = self.sizeToGrow - 1
+
+

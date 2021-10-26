@@ -26,18 +26,21 @@ class GUI(Thread):
                     self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="gray70", width=1)
         self.mainCanvas.pack(fill=BOTH, expand=1)
 
+
     def drawPoint(self, column, row):
-        self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="#000", width=1)
+        self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="#000", width=1, tags=str(column)+str(row))
     
     def deletePoint(self, column, row):
         if (row+column)%2==0:
-            self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="gray60", width=1)
+            self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="gray60", width=1, tags=str(column)+str(row))
         else:
-            self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="gray70", width=1)
+            self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="gray70", width=1, tags=str(column)+str(row))
 
     def drawSnake(self, positions):
+        self.mainCanvas.delete("background")
         for position in positions:
-            self.mainCanvas.create_rectangle(2 + 20*position['row'], 2 + 20*position['column'], 21 + 20*position['row'], 21 + 20*position['column'], outline="#000", fill="green", width=1)
+            self.mainCanvas.create_rectangle(2 + 20*position['row'], 2 + 20*position['column'], 21 + 20*position['row'], 21 + 20*position['column'], 
+            outline="#000", fill="green", width=1, tags=str(position['column'])+str(position['row']))
 
     def run(self):
         self.mainWindow = Tk()
