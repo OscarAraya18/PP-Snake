@@ -88,6 +88,7 @@ class Game:
             self.GUI.drawSnake([self.snakeHead])
             self.GUI.drawSnake([self.snakeTail])
             self.GUI.drawSnake(self.snakeBody)
+        self.detectPointCollision()
     
     def detectPlayerInput(self):
         try:
@@ -102,3 +103,9 @@ class Game:
         except:
             pass 
 
+    
+    def detectPointCollision(self):
+        if self.snakeHead['column'] == self.pointPosition['column'] and self.snakeHead['row'] == self.pointPosition['row']:
+            self.pointDisplayed = False
+            self.points = self.points + 1
+            print(self.points)

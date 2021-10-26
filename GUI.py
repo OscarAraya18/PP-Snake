@@ -26,9 +26,6 @@ class GUI(Thread):
                     self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="gray70", width=1)
         self.mainCanvas.pack(fill=BOTH, expand=1)
 
-    def cleanGameGrid(self, points):
-        pass
-
     def drawPoint(self, column, row):
         self.mainCanvas.create_rectangle(2 + 20*row, 2 + 20*column, 21 + 20*row, 21 + 20*column, outline="#000", fill="#000", width=1)
     
